@@ -1,23 +1,19 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import { Link } from "react-router-dom";
+import "./App.css";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ padding: "5%" }}>
+      <Link to="/svg">SVG</Link>
+      <br />
+      <Link to="/d3face">D3Face.js</Link>
+      <br />
+      <Link to="/d3barchart">D3BarChart.js</Link>
+      <br />
+      <Link to="/d3scatterchart">D3ScatterChart.js</Link>
+      <br />
+      <Link to="/d3carsscatterchart">D3CarsScatterChart.js</Link>
     </div>
   );
 }
