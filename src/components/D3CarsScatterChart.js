@@ -3,8 +3,7 @@ import {
   select,
   csv,
   scaleLinear,
-  max,
-  scalePoint,
+  extent,
   axisLeft,
   axisBottom,
   format,
@@ -16,33 +15,48 @@ function D3CarsScatterChart() {
     const margin = { left: 150, top: 50, bottom: 80, right: 20 };
     const innerWidth = +svg.attr("width") - margin.left - margin.right;
     const innerHeight = +svg.attr("height") - margin.top - margin.bottom;
-    const xValue = (d) => d.population;
-    const yValue = (d) => d.country;
+    const circleRadius = 3;
+    const xAxisLabel = "Horsepower";
+    const yAxisLabel = "Weight";
+    const title = "Cars: Horsepower vs Weight";
+    const xValue = (d) => d.horsepower;
+    const yValue = (d) => d.weight;
     const xScale = scaleLinear()
-      .domain([0, max(data, xValue)])
+      .domain(extent(data, xValue))
       .range([0, innerWidth])
       .nice();
-    const yScale = scalePoint()
-      .domain(data.map(yValue))
+    const yScale = scaleLinear()
+      .domain(extent(data, yValue))
       .range([0, innerHeight])
-      .padding(0.1);
+      .nice();
     const xAxisTickFormat = (number) =>
       format("0.3s")(number).replace("G", "B");
     const xAxis = axisBottom(xScale)
       .tickFormat(xAxisTickFormat)
-      .tickSize(-innerHeight);
+      .tickSize(-innerHeight)
+      .tickPadding(10);
     const yAxis = axisLeft(yScale).tickSize(-innerWidth);
     const g = svg
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
-    g.append("g").call(yAxis).selectAll(".domain").remove();
+    const yAxisG = g.append("g").call(yAxis);
+    yAxisG.selectAll(".domain").remove();
     const xAxisG = g
       .append("g")
       .call(xAxis)
       .attr("transform", `translate(0,${innerHeight})`);
+    yAxisG
+      .append("text")
+      .text(yAxisLabel)
+      .attr("fill", "black")
+      .attr("class", "axis-label")
+      .attr("x", -innerHeight / 2)
+      .attr("y", -60)
+      .attr("text-anchor", "middle")
+      .attr("transform", `rotate(-90)`);
     xAxisG
       .append("text")
-      .text("Population")
+      .text(xAxisLabel)
       .attr("fill", "black")
       .attr("class", "axis-label")
       .attr("x", innerWidth / 2)
@@ -53,16 +67,19 @@ function D3CarsScatterChart() {
       .append("circle")
       .attr("cy", (d) => yScale(yValue(d)))
       .attr("cx", (d) => xScale(xValue(d)))
-      .attr("r", 10);
-    g.append("text")
-      .text("Top 10 most populous countries")
-      .attr("y", -30)
-      .attr("class", "title");
+      .attr("r", circleRadius);
+    g.append("text").text(title).attr("y", -30).attr("class", "title");
   };
   useEffect(() => {
-    csv("./resources/PopulationData.csv").then((data) => {
+    csv("https://vizhub.com/curran/datasets/auto-mpg.csv").then((data) => {
       data.forEach((d) => {
-        d.population = +d.population * 1000;
+        d.mpg = +d.mpg;
+        d.cylinders = +d.cylinders;
+        d.displacement = +d.displacement;
+        d.horsepower = +d.horsepower;
+        d.weight = +d.weight;
+        d.acceleration = +d.acceleration;
+        d.year = +d.year;
       });
       render(data);
     });
